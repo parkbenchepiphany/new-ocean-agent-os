@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "new-ocean-agent-os"
+version = "0.1.0"
+description = "A small framework for running several AI agents against one shared knowledge base, safely: persistent memory, lane discipline, no black box."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Theo Egginton" }]
+keywords = ["ai", "agents", "multi-agent", "knowledge-base", "governance"]
+dependencies = ["pyyaml>=6.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.urls]
+Homepage = "https://github.com/parkbenchepiphany/new-ocean-agent-os"
+Writing = "https://theoegginton.substack.com"
+
+[tool.hatch.build.targets.wheel]
+packages = ["noaos"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

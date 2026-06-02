@@ -1,0 +1,25 @@
+# Lane configuration for the two-agent example.
+#
+# Two colleagues share one knowledge base:
+#
+#   scribe   ingests raw material and drops it into logs/. That is all it may
+#            touch. It cannot edit curated knowledge or rewrite decisions.
+#
+#   curator  promotes raw logs into durable knowledge under knowledge/, and
+#            records decisions under decisions/ in append-only mode so the
+#            history of why something was decided is never rewritten.
+#
+# Everything not granted here is denied. Closed by default.
+
+agents:
+  scribe:
+    - paths: ["logs/*"]
+      mode: write
+
+  curator:
+    - paths: ["knowledge/*"]
+      mode: write
+    - paths: ["decisions/*"]
+      mode: append
+    - paths: ["logs/*"]
+      mode: read
