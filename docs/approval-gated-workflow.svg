@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="660" viewBox="0 0 1180 660" role="img" aria-labelledby="title desc">
+  <title id="title">Approval-gated multi-agent knowledge workflow</title>
+  <desc id="desc">A diagram showing a user request flowing through agent proposal, context lookup, risk classification, approval gateway, human approval, execution, and audit logging.</desc>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+    </pattern>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrow-approval" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#fb7185"/>
+    </marker>
+    <style>
+      text { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace; fill: #e2e8f0; }
+      .label { font-size: 17px; font-weight: 700; }
+      .sub { font-size: 12px; fill: #cbd5e1; }
+      .tiny { font-size: 10px; fill: #94a3b8; }
+      .box { rx: 12; stroke-width: 2; }
+      .external { fill: #111827; stroke: #94a3b8; }
+      .agent { fill: #083344; stroke: #22d3ee; }
+      .store { fill: #2e1065; stroke: #a78bfa; }
+      .security { fill: #4c0519; stroke: #fb7185; }
+      .backend { fill: #064e3b; stroke: #34d399; }
+      .audit { fill: #422006; stroke: #fbbf24; }
+      .arrow { stroke: #38bdf8; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .approval { stroke: #fb7185; stroke-width: 2.5; stroke-dasharray: 7 5; fill: none; marker-end: url(#arrow-approval); }
+    </style>
+  </defs>
+  <rect width="1180" height="660" fill="#020617"/>
+  <rect width="1180" height="660" fill="url(#grid)" opacity="0.8"/>
+  <text x="40" y="50" class="label" font-size="24">Approval-gated multi-agent knowledge workflow</text>
+  <text x="40" y="78" class="sub">Context-rich automation with explicit permission boundaries and durable audit trails.</text>
+
+  <path class="arrow" d="M190 170 H285"/>
+  <path class="arrow" d="M455 170 H550"/>
+  <path class="arrow" d="M720 170 H815"/>
+  <path class="approval" d="M985 170 H1080 V320 H995"/>
+  <path class="approval" d="M815 320 H720"/>
+  <path class="arrow" d="M635 370 V455"/>
+  <path class="arrow" d="M635 515 V575 H295 V500"/>
+  <path class="arrow" d="M635 515 V575 H900 V500"/>
+
+  <rect x="40" y="120" width="150" height="100" class="box external"/>
+  <text x="65" y="160" class="label">User request</text>
+  <text x="65" y="184" class="sub">task, question,</text>
+  <text x="65" y="202" class="sub">or proposed change</text>
+
+  <rect x="285" y="120" width="170" height="100" class="box agent"/>
+  <text x="315" y="156" class="label">Agent proposes</text>
+  <text x="315" y="182" class="sub">intent, payload,</text>
+  <text x="315" y="200" class="sub">rationale</text>
+
+  <rect x="550" y="120" width="170" height="100" class="box store"/>
+  <text x="580" y="156" class="label">Context lookup</text>
+  <text x="580" y="182" class="sub">memory, docs,</text>
+  <text x="580" y="200" class="sub">lane policy</text>
+
+  <rect x="815" y="120" width="170" height="100" class="box security"/>
+  <text x="845" y="156" class="label">Risk check</text>
+  <text x="845" y="182" class="sub">scope, exposure,</text>
+  <text x="845" y="200" class="sub">side effects</text>
+
+  <rect x="815" y="270" width="180" height="100" class="box security"/>
+  <text x="845" y="306" class="label">Human approval</text>
+  <text x="845" y="332" class="sub">approve, reject,</text>
+  <text x="845" y="350" class="sub">or revise</text>
+
+  <rect x="515" y="270" width="205" height="100" class="box backend"/>
+  <text x="545" y="306" class="label">Approval gateway</text>
+  <text x="545" y="332" class="sub">state machine and</text>
+  <text x="545" y="350" class="sub">registered handlers</text>
+
+  <rect x="515" y="455" width="240" height="60" class="box backend"/>
+  <text x="555" y="492" class="label">Execute approved action</text>
+
+  <rect x="145" y="420" width="300" height="80" class="box audit"/>
+  <text x="175" y="456" class="label">Decision and audit log</text>
+  <text x="175" y="482" class="sub">allowed, refused, executed, error</text>
+
+  <rect x="780" y="420" width="300" height="80" class="box store"/>
+  <text x="810" y="456" class="label">Knowledge store update</text>
+  <text x="810" y="482" class="sub">readable notes and durable context</text>
+
+  <text x="40" y="620" class="tiny">Solid arrows show normal workflow. Dashed arrows show approval gates before consequential actions.</text>
+</svg>

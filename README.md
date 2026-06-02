@@ -15,6 +15,10 @@ New Ocean Agent OS gives each agent explicit lanes for reading, writing, and app
 
 ## Architecture
 
+![Approval-gated multi-agent knowledge workflow](docs/approval-gated-workflow.svg)
+
+The system separates knowledge work from consequential action. Agents can gather context, write to approved lanes, and propose follow-up work. Riskier actions move through an approval gateway before execution.
+
 ```text
 Scribe agent      Curator agent      Reviewer agent
      |                 |                  |
@@ -78,6 +82,11 @@ scribe.remember("logs/today", "raw observation")
 curator.remember("knowledge/item", "curated knowledge")
 curator.log_to("decisions/log", "decision rationale")
 ```
+
+## Example workflows
+
+- [Approval-gated research workflow](examples/approval_gated_research_workflow.md)
+- [Example operating model](examples/operating_model.md)
 
 ## License
 
