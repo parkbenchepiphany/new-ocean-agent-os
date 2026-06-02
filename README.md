@@ -1,26 +1,59 @@
 # New Ocean Agent OS
 
-A small framework for running several AI agents against one shared knowledge base, safely.
+A small framework for running several AI agents against one shared knowledge base, safely: persistent memory, lane discipline, and visible governance.
 
-Most discussions of AI agents focus on what one agent can do. The interesting problems start when you have several of them writing into the same knowledge base. Without a rule, they overwrite each other's work, and you lose the one thing that made a shared store worth building: trust that what is written is what was meant.
+Most agent demos ask what one agent can do. The harder production question is what happens when several agents read and write around the same body of knowledge. Without a shared operating model, they overwrite each other, blur accountability, and make the knowledge base less trustworthy over time.
 
-This is the working version of an idea I have been running in production for a while, generalised so anyone can pick it up. It rests on three decisions, kept deliberately separate.
+New Ocean Agent OS is a compact reference implementation for solving that problem with plain files, explicit write lanes, and an audit trail.
 
-## The three decisions
+## What it demonstrates
 
-**Persistent memory.** Knowledge lives in plain Markdown files with a little YAML frontmatter. You can open it, diff it, and read it without the framework. The point of the system is not the agents. The point is that canonical knowledge stops walking out of the building when an agent, or a person, goes away.
+- Persistent Markdown knowledge storage that can be read without the framework
+- Agent-specific lane policies for read, write, and append-only access
+- Closed-by-default governance for every write attempt
+- Audit logging for successful writes and refused actions
+- A minimal example of multiple agents working around one shared store
 
-**Lane discipline.** Each agent declares which paths it may write to, and in what mode. Everything not declared is denied. The default posture is closed, not open. A scribe that ingests raw material cannot reach in and rewrite curated knowledge, because it was never granted the lane.
+## System shape
 
-**No black box.** Every write attempt is recorded, including the ones that were refused. Governance is not a bolt-on. It is the part that makes the rest of it safe to scale. If an agent tried to step outside its lane, you can see that it tried. Nothing happens unseen.
+```text
++----------------+       +----------------+       +----------------+
+| Scribe agent   |       | Curator agent  |       | Reviewer agent |
+| raw capture    |       | promotion      |       | read-only      |
++-------+--------+       +-------+--------+       +-------+--------+
+        |                        |                        |
+        v                        v                        v
++------------------------------------------------------------------+
+| Lane policy                                                       |
+| logs/*: write     knowledge/*: write     decisions/*: append      |
++------------------------------------------------------------------+
+        |                        |                        |
+        v                        v                        v
++------------------------------------------------------------------+
+| Shared knowledge store, Markdown files plus YAML frontmatter       |
++------------------------------------------------------------------+
+        |
+        v
++------------------------------------------------------------------+
+| Audit log, every allowed and refused action is recorded            |
++------------------------------------------------------------------+
+```
 
-Three modes cover the cases that come up in practice:
+## The three design decisions
 
-| Mode | What it grants |
-|---|---|
-| `write` | full read and write inside the matched paths |
-| `append` | create and append, but never overwrite. Right for a decision log |
-| `read` | read but never write. Right for canon an agent should consult, not edit |
+**Persistent memory.** Knowledge lives in plain Markdown files with lightweight YAML frontmatter. You can open it, diff it, and read it without the framework. The point of the system is not the agents. The point is that canonical knowledge remains inspectable when an agent, vendor, or person changes.
+
+**Lane discipline.** Each agent declares which paths it may write to, and in what mode. Everything not declared is denied. A capture agent can write raw logs without being able to rewrite curated knowledge. A curator can promote knowledge without being able to edit areas it was not granted.
+
+**Visible governance.** Every write attempt is recorded, including refusals. Governance is not a bolt-on. It is the part that makes the rest of the system safe to scale. If an agent tried to step outside its lane, you can see that it tried.
+
+## Access modes
+
+| Mode | What it grants | Typical use |
+| --- | --- | --- |
+| `write` | Create and replace files inside matching paths | raw logs, draft notes, maintained knowledge |
+| `append` | Create and append, never overwrite | decision logs, audit appendices, review journals |
+| `read` | Read but never write | canon, policies, reference material |
 
 ## Quick start
 
@@ -31,7 +64,7 @@ pip install -e .
 python examples/two_agents.py
 ```
 
-The example wires up two agents, a `scribe` and a `curator`, from a small YAML lane config. It walks through the scribe capturing a raw log, the curator promoting it into durable knowledge, the curator recording a decision in append-only mode, and the scribe being refused when it reaches outside its lane. Then it prints the audit trail so you can see that every step, including the refusal, was on the record.
+The example wires up two agents, a `scribe` and a `curator`, from a small YAML lane config. It walks through raw capture, durable promotion, append-only decision logging, and a refused write attempt. It then prints the audit trail so the governance layer is visible.
 
 ## Using it in your own code
 
@@ -43,12 +76,13 @@ audit = AuditLog("kb/audit.jsonl")
 policy = LanePolicy.from_config({
     "agents": {
         "scribe":  [{"paths": ["logs/*"],       "mode": "write"}],
-        "curator": [{"paths": ["knowledge/*"],   "mode": "write"},
-                    {"paths": ["decisions/*"],   "mode": "append"}],
+        "curator": [{"paths": ["knowledge/*"],  "mode": "write"},
+                    {"paths": ["decisions/*"],  "mode": "append"}],
+        "reviewer": [{"paths": ["knowledge/*"], "mode": "read"}],
     }
 })
 
-scribe  = Agent("scribe",  store, policy, audit)
+scribe = Agent("scribe", store, policy, audit)
 curator = Agent("curator", store, policy, audit)
 
 scribe.remember("logs/today", "something worth keeping")
@@ -58,15 +92,25 @@ curator.log_to("decisions/log", "why we decided it this way")
 
 Reads and writes both run through the same path: check the lane, record the decision, then touch the store only if it was allowed.
 
-## How this was built
+## Example operating model
 
-I built this the way I actually work now, with AI tooling in the loop and a human owning every decision. That is the honest description of how a senior operator ships software in 2026, and it is the point rather than a disclaimer. The design choices, the lane model, the closed-by-default posture, the insistence that refusals get logged, are mine, and I can defend every one of them, because I run a version of this every day.
+This repo is intentionally small, but it points at a wider pattern:
 
-It is deliberately small. There is a keyword recall rather than a vector index, file storage rather than a database, and no network layer. Those are extension points, not v1 blockers. The framework is the shape, and the shape is the part that matters.
+1. Capture agents can collect raw material into a restricted inbox.
+2. Curator agents can promote stable knowledge into canonical notes.
+3. Decision agents can append reasoning without editing past decisions.
+4. Review agents can inspect outputs without creating new writes.
+5. A human can audit both the knowledge store and the refused actions.
 
-## Where the thinking comes from
+## Why this matters
 
-I write about this kind of work at [New Ocean](https://theoegginton.substack.com). The first post there, on building lane discipline into a multi-agent stack, is the essay this repository makes concrete.
+AI systems become risky when they are treated as magic helpers with broad access and weak boundaries. The practical alternative is not to stop using agents. It is to give them clear lanes, record what they do, and keep durable knowledge in a form people can inspect.
+
+That is the purpose of this repo: a small, understandable pattern for agentic workflows where trust is built into the file system, not promised after the fact.
+
+## Portfolio note
+
+This is a generalized reference implementation. It avoids private operational data, live access material, personal context, client information, and employer-specific systems. The repo exists to show the reusable pattern: multi-agent knowledge work with explicit governance.
 
 ## License
 

@@ -41,20 +41,20 @@ def main() -> None:
 
     # 1. The scribe captures something raw. Inside its lane.
     scribe.remember(
-        "logs/2026-06-02-support-call",
-        "Customer could not reset their password from the mobile app.",
+        "logs/2026-06-02-onboarding-note",
+        "New users were unsure where to find the onboarding checklist.",
         description="Raw note from a support call",
     )
-    print("scribe wrote logs/2026-06-02-support-call  (allowed)")
+    print("scribe wrote logs/2026-06-02-onboarding-note  (allowed)")
 
     # 2. The curator promotes it into durable, named knowledge.
     curator.remember(
-        "knowledge/password-reset-mobile-gap",
+        "knowledge/onboarding-checklist-gap",
         "Mobile password reset is broken. Workaround: reset on web, then sign "
         "in on mobile. Tracked for a real fix.",
-        description="Known issue and workaround for mobile password reset",
+        description="Known issue for onboarding checklist discovery",
     )
-    print("curator wrote knowledge/password-reset-mobile-gap  (allowed)")
+    print("curator wrote knowledge/onboarding-checklist-gap  (allowed)")
 
     # 3. The curator records the decision, append-only.
     curator.log_to(
@@ -67,7 +67,7 @@ def main() -> None:
     # 4. The scribe tries to edit curated knowledge. Outside its lane.
     try:
         scribe.remember(
-            "knowledge/password-reset-mobile-gap",
+            "knowledge/onboarding-checklist-gap",
             "scribe trying to overwrite the curated note",
         )
     except LaneViolation as violation:

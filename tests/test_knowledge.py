@@ -36,8 +36,8 @@ def test_names_includes_subfolders(tmp_path):
 
 def test_recall_ranks_by_term_matches(tmp_path):
     store = KnowledgeStore(tmp_path)
-    store.write(Note("a", "x", {"description": "password reset on mobile"}))
+    store.write(Note("a", "x", {"description": "onboarding checklist entry"}))
     store.write(Note("b", "y", {"description": "billing question"}))
-    hits = store.recall("mobile password")
+    hits = store.recall("onboarding checklist")
     assert hits[0].name == "a"
     assert all(hit.name != "b" for hit in hits)
